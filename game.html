@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Birthday Tic Tac Toe</title>
+  <style>
+    /* Game Styles */
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: linear-gradient(135deg, #ffcce6, #fad0c4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .game-container {
+      text-align: center;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      transform: scale(0.95);
+      transition: transform 0.3s ease;
+      max-width: 90vw;
+    }
+
+    .game-container:hover {
+      transform: scale(1);
+    }
+
+    h1 {
+      color: #d23369;
+      margin-bottom: 1rem;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .status {
+      font-size: 1.5rem;
+      margin: 1rem 0;
+      color: #ff6b6b;
+      font-weight: bold;
+      height: 2rem;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 1rem auto;
+      max-width: 300px;
+    }
+
+    .cell {
+      width: 80px;
+      height: 80px;
+      background: white;
+      border: 2px solid #ffb3d9;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .cell:hover {
+      transform: scale(1.05);
+      background: #fff0f6;
+    }
+
+    .cell.x { color: #ff6b6b; }
+    .cell.o { color: #6b6bff; }
+
+    .controls {
+      margin-top: 1.5rem;
+    }
+
+    button {
+      background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+    }
+
+    /* Confetti Effect */
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: #f00;
+      opacity: 0;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 400px) {
+      .cell {
+        width: 60px;
+        height: 60px;
+        font-size: 2rem;
+      }
+    }
+
+    /* Animations */
+    @keyframes bounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    .winner {
+      animation: bounce 0.5s ease infinite;
+    }
+    .back-btn {
+  display: inline-block;
+  padding: 8px 20px;
+  background: linear-gradient(45deg, #6b6bff, #8e8eff);
+  color: white;
+  text-decoration: none;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(107, 107, 255, 0.3);
+  margin-top: 20px;
+}
+
+.back-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(107, 107, 255, 0.4);
+}
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back-btn">Back to Birthday</a>
+  <div class="game-container">
+    <h1>Birthday Tic Tac Toe!</h1>
+    <div class="status">Zayed's turn (X)</div>
+    <div class="board" id="board">
+      <!-- Cells will be added by JavaScript -->
+    </div>
+    <div class="controls">
+      <button id="resetBtn">Play Again</button>
+    </div>
+  </div>
+<div style="margin-top: 20px;">
+  <a href="index.html" style="
+    display: inline-block;
+    padding: 8px 20px;
+    background: linear-gradient(45deg, #6b6bff, #8e8eff);
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(107, 107, 255, 0.3);
+  ">Back to Birthday</a>
+</div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const board = document.getElementById('board');
+      const status = document.querySelector('.status');
+      const resetBtn = document.getElementById('resetBtn');
+      let currentPlayer = 'X';
+      let gameState = ['', '', '', '', '', '', '', '', ''];
+      const winningConditions = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+        [0, 4, 8], [2, 4, 6]             // diagonals
+      ];
+      let gameActive = true;
+
+      // Create board cells
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.setAttribute('data-index', i);
+        cell.addEventListener('click', handleCellClick);
+        board.appendChild(cell);
+      }
+
+      // Game functions
+      function handleCellClick(e) {
+        const clickedCell = e.target;
+        const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
+
+        if (gameState[clickedCellIndex] !== '' || !gameActive) return;
+
+        updateCell(clickedCell, clickedCellIndex);
+        checkResult();
+      }
+
+      function updateCell(cell, index) {
+        gameState[index] = currentPlayer;
+        cell.textContent = currentPlayer;
+        cell.classList.add(currentPlayer.toLowerCase());
+      }
+
+      function checkResult() {
+        let roundWon = false;
+        
+        for (let i = 0; i < winningConditions.length; i++) {
+          const [a, b, c] = winningConditions[i];
+          if (gameState[a] === '' || gameState[b] === '' || gameState[c] === '') continue;
+          
+          if (gameState[a] === gameState[b] && gameState[b] === gameState[c]) {
+            roundWon = true;
+            highlightWinnerCells([a, b, c]);
+            break;
+          }
+        }
+
+        if (roundWon) {
+          status.textContent = `🎉 ${currentPlayer === 'X' ? 'Zayed' : 'You'} wins!`;
+          gameActive = false;
+          createConfetti();
+          return;
+        }
+
+        if (!gameState.includes('')) {
+          status.textContent = "Game ended in a draw!";
+          gameActive = false;
+          return;
+        }
+
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        status.textContent = `${currentPlayer === 'X' ? 'Zayed' : 'Your'} turn (${currentPlayer})`;
+      }
+
+      function highlightWinnerCells(cells) {
+        cells.forEach(index => {
+          document.querySelector(`.cell[data-index="${index}"]`).classList.add('winner');
+        });
+      }
+
+      function createConfetti() {
+        for (let i = 0; i < 100; i++) {
+          const confetti = document.createElement('div');
+          confetti.classList.add('confetti');
+          confetti.style.left = Math.random() * 100 + 'vw';
+          confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+          confetti.style.opacity = Math.random() + 0.5;
+          document.body.appendChild(confetti);
+          
+          const animationDuration = Math.random() * 3 + 2;
+          confetti.style.animation = `float ${animationDuration}s ease-in forwards`;
+          
+          setTimeout(() => {
+            confetti.remove();
+          }, animationDuration * 1000);
+        }
+      }
+
+      // Reset game
+      resetBtn.addEventListener('click', resetGame);
+
+      function resetGame() {
+        currentPlayer = 'X';
+        gameState = ['', '', '', '', '', '', '', '', ''];
+        gameActive = true;
+        status.textContent = `Zayed's turn (X)`;
+        
+        document.querySelectorAll('.cell').forEach(cell => {
+          cell.textContent = '';
+          cell.className = 'cell';
+          cell.addEventListener('click', handleCellClick);
+        });
+      }
+
+      // Confetti animation
+      document.head.insertAdjacentHTML('beforeend', `
+        <style>
+          @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+          }
+        </style>
+        
+      `);
+    });
+  </script>
+</body>
+</html>
