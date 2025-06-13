@@ -1,0 +1,47 @@
+<!-- File: style.css -->
+body {
+  margin: 0;
+  padding: 0;
+  background: black;
+  color: white;
+  font-family: 'Segoe UI', sans-serif;
+  text-align: center;
+}
+.container {
+  margin-top: 10vh;
+  padding: 20px;
+}
+.main-text {
+  font-size: 2.5em;
+  background: linear-gradient(90deg, #f0f, #0ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: glow 3s ease-in-out infinite;
+}
+.sub-text {
+  font-size: 1.2em;
+  margin: 10px 0 20px;
+}
+.enter-btn, .next-btn, .music-btn {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: #ff1493;
+  color: white;
+  text-decoration: none;
+  border-radius: 10px;
+  margin-top: 20px;
+  font-size: 1em;
+  cursor: pointer;
+}
+.gallery img {
+  width: 200px;
+  height: auto;
+  margin: 10px;
+  border-radius: 10px;
+  border: 2px solid #fff;
+}
+@keyframes glow {
+  0% { text-shadow: 0 0 10px #fff; }
+  50% { text-shadow: 0 0 20px #0ff, 0 0 30px #f0f; }
+  100% { text-shadow: 0 0 10px #fff; }
+}

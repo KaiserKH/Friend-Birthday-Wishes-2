@@ -1,0 +1,175 @@
+<!-- File: music.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Music for You</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <style>
+    /* Music Page Specific Styles */
+.music-btn {
+  display: inline-block;
+  padding: 15px 40px;
+  background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 2rem 0;
+  box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.music-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.6);
+}
+
+.music-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%);
+  transform-origin: 50% 50%;
+}
+
+.music-btn:focus:not(:active)::after {
+  animation: ripple 1s ease-out;
+}
+
+/* Music Visualizer */
+.visualizer {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 100px;
+  margin: 2rem 0;
+  gap: 5px;
+}
+
+.bar {
+  width: 8px;
+  background: linear-gradient(to top, #ff6b6b, #ff8e8e);
+  border-radius: 5px;
+  animation: equalize 1.5s infinite ease-in-out;
+}
+
+/* Animations */
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(20, 20);
+    opacity: 0;
+  }
+}
+
+@keyframes equalize {
+  0%, 100% { height: 10px; }
+  50% { height: 50px; }
+}
+
+/* Create 20 visualizer bars with different animation delays */
+.bar:nth-child(1) { animation-delay: 0.1s; }
+.bar:nth-child(2) { animation-delay: 0.2s; }
+.bar:nth-child(3) { animation-delay: 0.3s; }
+/* ... add more as needed up to 20 */
+  </style>
+  <div class="container">
+    <h1>Play Your Birthday Song 🎶</h1>
+    <button onclick="playMusic()" class="music-btn">Tap to Play Music</button>
+    <a href="game.html" class="next-btn">Let's Play The tic Tac Toe Game</a>
+  </div>
+  <audio id="bg-music" src="audio.mp3" loop></audio>
+  <script>
+    // Create visualizer bars dynamically
+const visualizer = document.createElement('div');
+visualizer.className = 'visualizer';
+document.querySelector('.container').insertBefore(visualizer, document.querySelector('.next-btn'));
+
+for (let i = 0; i < 20; i++) {
+  const bar = document.createElement('div');
+  bar.className = 'bar';
+  bar.style.animationDelay = `${i * 0.05}s`;
+  visualizer.appendChild(bar);
+}
+
+// Enhanced music player
+function playMusic() {
+  const audio = document.getElementById('bg-music');
+  const btn = document.querySelector('.music-btn');
+  
+  if (audio.paused) {
+    audio.play();
+    btn.textContent = '🎵 Music Playing... Tap to Pause';
+    btn.style.background = 'linear-gradient(45deg, #6b6bff, #8e8eff)';
+    
+    // Sync visualizer with actual audio (simulated)
+    const bars = document.querySelectorAll('.bar');
+    bars.forEach(bar => {
+      bar.style.animationPlayState = 'running';
+    });
+  } else {
+    audio.pause();
+    btn.textContent = '▶️ Tap to Play Music';
+    btn.style.background = 'linear-gradient(45deg, #ff6b6b, #ff8e8e)';
+    
+    const bars = document.querySelectorAll('.bar');
+    bars.forEach(bar => {
+      bar.style.animationPlayState = 'paused';
+    });
+  }
+}
+
+// Initialize audio context for real visualization (optional)
+try {
+  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const analyser = audioContext.createAnalyser();
+  const audioElement = document.getElementById('bg-music');
+  const source = audioContext.createMediaElementSource(audioElement);
+  
+  source.connect(analyser);
+  analyser.connect(audioContext.destination);
+  analyser.fftSize = 64;
+  
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
+  
+  function updateVisualizer() {
+    requestAnimationFrame(updateVisualizer);
+    analyser.getByteFrequencyData(dataArray);
+    
+    const bars = document.querySelectorAll('.bar');
+    for (let i = 0; i < bars.length; i++) {
+      const value = dataArray[i % bufferLength] / 255;
+      const height = value * 100;
+      bars[i].style.height = `${height}px`;
+    }
+  }
+  
+  audioElement.addEventListener('play', () => {
+    audioContext.resume().then(() => {
+      updateVisualizer();
+    });
+  });
+} catch (e) {
+  console.log("Audio visualization error:", e);
+}
+  </script>
+</body>
+</html>

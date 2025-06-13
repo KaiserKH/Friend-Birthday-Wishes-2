@@ -1,0 +1,101 @@
+<!-- File: wishes.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wishes for Zayed</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <style>
+/* Wishes Page Specific Styles */
+.wish-message {
+  font-size: 1.8rem;
+  line-height: 1.6;
+  color: #333;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 15px;
+  position: relative;
+  animation: slideUp 1s ease-out;
+}
+
+.wish-message::before {
+  content: '"';
+  font-size: 5rem;
+  color: rgba(255, 107, 107, 0.2);
+  position: absolute;
+  left: 10px;
+  top: -20px;
+}
+
+.next-btn {
+  display: inline-block;
+  padding: 10px 25px;
+  background: linear-gradient(45deg, #6b6bff, #8e8eff);
+  color: white;
+  text-decoration: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(107, 107, 255, 0.3);
+  margin-top: 1rem;
+}
+
+.next-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(107, 107, 255, 0.4);
+}
+
+/* Heart Pulse Animation */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.heart {
+  display: inline-block;
+  animation: pulse 1.5s infinite;
+  color: #ff6b6b;
+}
+
+/* New Animations */
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+  </style>
+  <div class="container">
+    <h1>Happy Birthday Zayed! 🥳</h1>
+    <p class="wish-message">From Kamran 💖<br>You are not just a friend, you are Meri Jaan. Wishing you all the happiness and love today and forever!</p>
+    <a href="gallery.html" class="next-btn">Next: Gallery</a>
+  </div>
+  <script>
+// Wishes Page Effects
+document.addEventListener('DOMContentLoaded', function() {
+  // Add heart animation to all heart emojis
+  const hearts = document.querySelectorAll('.wish-message');
+  hearts.forEach(msg => {
+    msg.innerHTML = msg.innerHTML.replace(/💖/g, '<span class="heart">💖</span>');
+  });
+  
+  // Background music continuation (if coming from index.html)
+  const bgMusic = document.getElementById('bg-music') || new Audio('audio/audio.mp3');
+  bgMusic.volume = 0.3;
+  bgMusic.loop = true;
+  
+  // Try to play music (will work if user already interacted before)
+  bgMusic.play().catch(e => console.log("Auto-play prevented:", e));
+});
+  </script>
+</body>
+</html>
